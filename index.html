@@ -360,6 +360,259 @@ footer {
   </div>
 </section>
 
+<section id="ai-consulting" style="background:linear-gradient(180deg,#0f172a 0%,#1e1b4b 100%);padding:80px 24px;font-family:'DM Sans',system-ui,sans-serif;">
+<div style="max-width:860px;margin:0 auto;">
+  <p style="font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f97316;margin-bottom:10px;">AI Consulting</p>
+  <h2 style="font-size:clamp(26px,4vw,38px);font-weight:700;color:#f8fafc;margin:0 0 12px;line-height:1.2;">How much is your business<br><span style="color:#f97316;">leaving on the table?</span></h2>
+  <p style="font-size:16px;color:#94a3b8;margin-bottom:36px;line-height:1.6;max-width:560px;">Fill out this free worksheet and we'll show you exactly where AI can save your business money — and which tools do the job.</p>
+
+  <!-- Step form -->
+  <div id="aic-form"></div>
+
+  <!-- Packages -->
+  <div style="margin-top:56px;">
+    <p style="font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f97316;margin-bottom:10px;">Our Packages</p>
+    <h3 style="font-size:24px;font-weight:700;color:#f8fafc;margin-bottom:6px;">Simple, flat-rate pricing</h3>
+    <p style="font-size:16px;color:#94a3b8;margin-bottom:28px;line-height:1.6;">No hidden fees. No long-term lock-in on the starter plan.</p>
+    <div id="aic-packages"></div>
+  </div>
+</div>
+</section>
+
+<script>
+(function(){
+  var CATEGORIES = [
+    {id:"payroll",label:"Payroll & HR",icon:"👥",desc:"Time tracking, tip pooling, onboarding, compliance & benefits.",tools:["Gusto","Homebase","Rippling"],savings:0.3},
+    {id:"accounting",label:"Accounting",icon:"📊",desc:"Invoicing, reconciliation, expense categorization & tax prep.",tools:["QuickBooks AI","Botkeeper","MarginEdge"],savings:0.4},
+    {id:"scheduling",label:"Scheduling",icon:"📅",desc:"Staff scheduling, shift swaps, no-call tracking & reminders.",tools:["7shifts","When I Work","Homebase"],savings:0.4},
+    {id:"inventory",label:"Inventory",icon:"📦",desc:"Auto reorders, waste tracking, vendor management & par levels.",tools:["MarketMan","BlueCart","Craftable"],savings:0.35},
+    {id:"marketing",label:"Marketing",icon:"📣",desc:"Social posts, email campaigns, specials & review automation.",tools:["Broadly","ChatGPT","Canva AI"],savings:0.45},
+    {id:"support",label:"Customer Support",icon:"💬",desc:"Review responses, chatbots, reputation management & feedback.",tools:["Ovation","Broadly","Birdeye"],savings:0.5},
+    {id:"crm",label:"CRM & Sales",icon:"🤝",desc:"Lead tracking, follow-ups, pipeline & customer loyalty.",tools:["HubSpot AI","Clay","Keap"],savings:0.35},
+    {id:"admin",label:"Admin & Paperwork",icon:"🗂️",desc:"Meeting notes, document routing, scheduling & data entry.",tools:["Otter.ai","Notion AI","Reclaim.ai"],savings:0.4}
+  ];
+  var PACKAGES = [
+    {name:"Audit Only",price:"$299",period:"one-time",setup:null,featured:false,features:["AI savings worksheet with you","Custom savings report","Tool recommendations","30-min walkthrough call"]},
+    {name:"Done-For-You",price:"$497",period:"/mo",setup:"+ $1,500 setup",featured:true,features:["Everything in Audit Only","Up to 3 AI tools installed","Staff training session","90-day roadmap","Monthly check-in & optimization","Email support within 24 hrs"]},
+    {name:"Full AI Ops",price:"$997",period:"/mo",setup:"+ $2,500 setup",featured:false,features:["Everything in Done-For-You","Up to 6 AI tools managed","Bi-weekly calls + priority support","Quarterly ROI reports","New tool monitoring","Vendor negotiation"]}
+  ];
+
+  var state = {step:1,bizName:"",industry:"",employees:"",checked:{},spend:{},open:{}};
+
+  function checkSVG(){
+    return '<svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  function checkIcon(active){
+    return '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:'+(active?'#f97316':'rgba(255,255,255,0.08)')+';border:'+(active?'none':'1.5px solid rgba(255,255,255,0.2)')+';flex-shrink:0;margin-top:2px;">'+(active?checkSVG():'')+'</span>';
+  }
+  function progressBar(){
+    var html='<div style="display:flex;gap:8px;margin-bottom:28px;">';
+    for(var s=1;s<=3;s++){
+      var w=s===state.step?28:8;
+      var bg=s<state.step?'#4ade80':s===state.step?'#6366f1':'rgba(255,255,255,0.12)';
+      html+='<div style="width:'+w+'px;height:8px;border-radius:4px;background:'+bg+';transition:all .3s;"></div>';
+    }
+    html+='</div>';
+    return html;
+  }
+
+  function renderCategoryCard(cat){
+    var checked=!!state.checked[cat.id];
+    var spendVal=state.spend[cat.id]||'';
+    var open=!!state.open[cat.id];
+    var bg=checked?'rgba(99,102,241,0.12)':'rgba(255,255,255,0.04)';
+    var border=checked?'1px solid rgba(99,102,241,0.5)':'1px solid rgba(255,255,255,0.08)';
+    var html='<div data-catid="'+cat.id+'" style="background:'+bg+';border:'+border+';border-radius:12px;overflow:hidden;">';
+    html+='<div class="aic-catrow" data-catid="'+cat.id+'" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;">';
+    html+=checkIcon(checked);
+    html+='<span style="font-size:16px;">'+cat.icon+'</span>';
+    html+='<span style="flex:1;font-size:14px;font-weight:500;color:#f1f5f9;">'+cat.label+'</span>';
+    html+='<div style="display:flex;align-items:center;gap:4px;" onclick="event.stopPropagation()">';
+    html+='<span style="font-size:12px;color:#94a3b8;">$</span>';
+    html+='<input type="number" min="0" placeholder="0" value="'+spendVal+'" data-spendid="'+cat.id+'" style="width:72px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 6px;color:#f1f5f9;font-size:13px;text-align:right;outline:none;" onclick="event.stopPropagation()">';
+    html+='<span style="font-size:11px;color:#64748b;">/mo</span>';
+    html+='</div>';
+    html+='<button class="aic-expand" data-catid="'+cat.id+'" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:12px;padding:0 4px;transition:transform .2s;transform:'+(open?'rotate(180deg)':'rotate(0)')+';" onclick="event.stopPropagation()">▾</button>';
+    html+='</div>';
+    if(open){
+      html+='<div style="padding:0 14px 14px 42px;border-top:1px solid rgba(255,255,255,0.06);">';
+      html+='<p style="font-size:13px;color:#94a3b8;margin:10px 0 8px;line-height:1.5;">'+cat.desc+'</p>';
+      html+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      cat.tools.forEach(function(t){html+='<span style="font-size:11px;background:rgba(99,102,241,0.15);color:#a5b4fc;padding:3px 10px;border-radius:20px;font-weight:500;">'+t+'</span>';});
+      html+='<span style="font-size:11px;background:rgba(34,197,94,0.12);color:#4ade80;padding:3px 10px;border-radius:20px;font-weight:500;margin-left:auto;">~'+Math.round(cat.savings*100)+'% savings potential</span>';
+      html+='</div></div>';
+    }
+    html+='</div>';
+    return html;
+  }
+
+  function renderStep1(){
+    var industryOpts=["Restaurant / Bar","Retail","Construction / Trades","Auto Shop","Salon / Spa","Healthcare","Real Estate","Legal / Professional","Marketing / Agency","Other"];
+    var empOpts=["Just me","2–5","6–20","21–50","51–100","100+"];
+    var html=progressBar();
+    html+='<p style="font-size:16px;font-weight:600;color:#f1f5f9;margin-bottom:4px;">Step 1 — Tell us about your business</p>';
+    html+='<p style="font-size:13px;color:#64748b;margin-bottom:20px;">Takes under a minute. No commitment.</p>';
+    html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px;">';
+    html+='<div><p style="font-size:12px;color:#64748b;margin-bottom:6px;font-weight:500;">Business name (optional)</p><input id="aic-bizname" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 14px;color:#f1f5f9;font-size:14px;outline:none;box-sizing:border-box;" placeholder="Rosie\'s Bar &amp; Grill" value="'+escHtml(state.bizName)+'"></div>';
+    html+='<div><p style="font-size:12px;color:#64748b;margin-bottom:6px;font-weight:500;">Industry</p><select id="aic-industry" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 14px;color:#f1f5f9;font-size:14px;outline:none;box-sizing:border-box;appearance:none;"><option value="">Select...</option>';
+    industryOpts.forEach(function(o){html+='<option'+(state.industry===o?' selected':'')+'>'+escHtml(o)+'</option>';});
+    html+='</select></div>';
+    html+='<div><p style="font-size:12px;color:#64748b;margin-bottom:6px;font-weight:500;">Employees</p><select id="aic-employees" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 14px;color:#f1f5f9;font-size:14px;outline:none;box-sizing:border-box;appearance:none;"><option value="">Select...</option>';
+    empOpts.forEach(function(o){html+='<option'+(state.employees===o?' selected':'')+'>'+escHtml(o)+'</option>';});
+    html+='</select></div>';
+    html+='</div>';
+    html+='<div style="display:flex;justify-content:flex-end;"><button id="aic-next1" style="background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);border:none;border-radius:10px;padding:12px 28px;color:#fff;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;">Next: Select cost areas →</button></div>';
+    return html;
+  }
+
+  function renderStep2(){
+    var html=progressBar();
+    html+='<p style="font-size:16px;font-weight:600;color:#f1f5f9;margin-bottom:4px;">Step 2 — Check your cost areas</p>';
+    html+='<p style="font-size:13px;color:#64748b;margin-bottom:20px;">Check the ones that apply. Enter your approximate monthly spend. Click the arrow to see AI tools.</p>';
+    html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:8px;margin-bottom:20px;">';
+    CATEGORIES.forEach(function(cat){html+=renderCategoryCard(cat);});
+    html+='</div>';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;">';
+    html+='<button id="aic-back1" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 20px;color:#94a3b8;font-weight:500;font-size:15px;cursor:pointer;font-family:inherit;">← Back</button>';
+    html+='<button id="aic-next2" style="background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);border:none;border-radius:10px;padding:12px 28px;color:#fff;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;">See my savings report →</button>';
+    html+='</div>';
+    return html;
+  }
+
+  function renderStep3(){
+    var selected=CATEGORIES.filter(function(c){return state.checked[c.id];});
+    var totalSpend=selected.reduce(function(a,c){return a+(state.spend[c.id]||0);},0);
+    var totalSave=selected.reduce(function(a,c){return a+Math.round((state.spend[c.id]||0)*c.savings);},0);
+    var pct=totalSpend>0?Math.round((totalSave/totalSpend)*100):0;
+    var sorted=selected.slice().sort(function(a,b){return (state.spend[b.id]||0)*b.savings-(state.spend[a.id]||0)*a.savings;});
+    var html=progressBar();
+    html+='<p style="font-size:16px;font-weight:600;color:#f1f5f9;margin-bottom:4px;">Your AI savings report'+(state.bizName?' — '+escHtml(state.bizName):'')+'</p>';
+    html+='<p style="font-size:13px;color:#64748b;margin-bottom:20px;">Based on '+selected.length+' cost area'+(selected.length!==1?'s':'')+' selected.</p>';
+    html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">';
+    [{val:'$'+totalSpend.toLocaleString(),lbl:'Monthly ops spend',color:'#f1f5f9'},{val:'$'+totalSave.toLocaleString(),lbl:'Est. monthly savings',color:'#4ade80'},{val:pct+'%',lbl:'Avg. cost reduction',color:'#4ade80'}].forEach(function(item){
+      html+='<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center;"><p style="font-size:24px;font-weight:700;color:'+item.color+';margin:0;">'+item.val+'</p><p style="font-size:12px;color:#64748b;margin-top:4px;margin-bottom:0;">'+item.lbl+'</p></div>';
+    });
+    html+='</div>';
+    if(selected.length===0){
+      html+='<p style="text-align:center;color:#64748b;font-size:14px;padding:16px 0;">No areas selected. Go back and check some boxes.</p>';
+    } else {
+      html+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">';
+      sorted.forEach(function(cat){
+        var save=Math.round((state.spend[cat.id]||0)*cat.savings);
+        html+='<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 16px;">';
+        html+='<div><p style="font-size:14px;font-weight:600;color:#f1f5f9;margin:0;">'+cat.icon+' '+cat.label+'</p><p style="font-size:12px;color:#64748b;margin:3px 0 0;">'+cat.tools.join(' · ')+'</p></div>';
+        html+='<div style="text-align:right;"><p style="font-size:16px;font-weight:700;color:#4ade80;margin:0;">$'+save.toLocaleString()+'/mo</p><p style="font-size:11px;color:#64748b;margin:2px 0 0;">'+Math.round(cat.savings*100)+'% reduction</p></div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+    html+='<div style="background:linear-gradient(135deg,rgba(99,102,241,0.15) 0%,rgba(249,115,22,0.1) 100%);border:1px solid rgba(99,102,241,0.3);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;">';
+    html+='<p style="font-size:15px;font-weight:600;color:#f1f5f9;margin-bottom:6px;">Ready to stop leaving money on the table?</p>';
+    html+='<p style="font-size:13px;color:#94a3b8;margin-bottom:16px;">We\'ll set it all up. You just show up and run your business.</p>';
+    html+='<a href="mailto:ryan@remventures.tech?subject=AI Consulting Inquiry" style="display:inline-block;background:linear-gradient(135deg,#f97316 0%,#ea580c 100%);border-radius:10px;padding:12px 28px;color:#fff;font-weight:700;font-size:15px;text-decoration:none;font-family:inherit;">Get my free savings audit →</a>';
+    html+='</div>';
+    html+='<div style="display:flex;justify-content:space-between;">';
+    html+='<button id="aic-back2" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 20px;color:#94a3b8;font-weight:500;font-size:15px;cursor:pointer;font-family:inherit;">← Adjust inputs</button>';
+    html+='<button id="aic-restart" style="background:rgba(255,255,255,0.06);border:1px solid rgba(99,102,241,0.3);border-radius:10px;padding:12px 20px;color:#6366f1;font-weight:500;font-size:15px;cursor:pointer;font-family:inherit;">Start over</button>';
+    html+='</div>';
+    return html;
+  }
+
+  function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+  var cardStyle='background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;margin-bottom:24px;';
+
+  function render(){
+    var formEl=document.getElementById('aic-form');
+    var html='<div style="'+cardStyle+'">';
+    if(state.step===1) html+=renderStep1();
+    else if(state.step===2) html+=renderStep2();
+    else html+=renderStep3();
+    html+='</div>';
+    formEl.innerHTML=html;
+    bindEvents();
+  }
+
+  function bindEvents(){
+    var el;
+    // Step 1
+    el=document.getElementById('aic-bizname');
+    if(el) el.addEventListener('input',function(){state.bizName=this.value;});
+    el=document.getElementById('aic-industry');
+    if(el) el.addEventListener('change',function(){state.industry=this.value;});
+    el=document.getElementById('aic-employees');
+    if(el) el.addEventListener('change',function(){state.employees=this.value;});
+    el=document.getElementById('aic-next1');
+    if(el) el.addEventListener('click',function(){state.step=2;render();});
+
+    // Step 2
+    el=document.getElementById('aic-back1');
+    if(el) el.addEventListener('click',function(){state.step=1;render();});
+    el=document.getElementById('aic-next2');
+    if(el) el.addEventListener('click',function(){state.step=3;render();});
+    document.querySelectorAll('.aic-catrow').forEach(function(row){
+      row.addEventListener('click',function(){
+        var id=this.getAttribute('data-catid');
+        state.checked[id]=!state.checked[id];
+        render();
+      });
+    });
+    document.querySelectorAll('.aic-expand').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();
+        var id=this.getAttribute('data-catid');
+        state.open[id]=!state.open[id];
+        render();
+      });
+    });
+    document.querySelectorAll('input[data-spendid]').forEach(function(inp){
+      inp.addEventListener('input',function(e){
+        e.stopPropagation();
+        var id=this.getAttribute('data-spendid');
+        state.spend[id]=parseFloat(this.value)||0;
+      });
+    });
+
+    // Step 3
+    el=document.getElementById('aic-back2');
+    if(el) el.addEventListener('click',function(){state.step=2;render();});
+    el=document.getElementById('aic-restart');
+    if(el) el.addEventListener('click',function(){state={step:1,bizName:"",industry:"",employees:"",checked:{},spend:{},open:{}};render();});
+  }
+
+  // Render packages
+  function renderPackages(){
+    var el=document.getElementById('aic-packages');
+    var html='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">';
+    PACKAGES.forEach(function(pkg){
+      var bg=pkg.featured?'linear-gradient(145deg,rgba(99,102,241,0.2) 0%,rgba(79,70,229,0.15) 100%)':'rgba(255,255,255,0.04)';
+      var border=pkg.featured?'2px solid rgba(99,102,241,0.6)':'1px solid rgba(255,255,255,0.08)';
+      html+='<div style="background:'+bg+';border:'+border+';border-radius:16px;padding:24px 20px;position:relative;">';
+      if(pkg.featured) html+='<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;">Most Popular</div>';
+      html+='<p style="font-size:13px;font-weight:600;color:'+(pkg.featured?'#a5b4fc':'#64748b')+';margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">'+pkg.name+'</p>';
+      html+='<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px;"><span style="font-size:32px;font-weight:800;color:#f8fafc;">'+pkg.price+'</span><span style="font-size:14px;color:#64748b;">'+pkg.period+'</span></div>';
+      if(pkg.setup) html+='<p style="font-size:12px;color:#64748b;margin-bottom:16px;">'+pkg.setup+'</p>';
+      html+='<div style="height:1px;background:rgba(255,255,255,0.08);margin:16px 0;"></div>';
+      html+='<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">';
+      pkg.features.forEach(function(f){
+        html+='<div style="display:flex;align-items:flex-start;gap:10px;">'+checkIcon(true)+'<span style="font-size:13px;color:#cbd5e1;line-height:1.4;">'+escHtml(f)+'</span></div>';
+      });
+      html+='</div>';
+      var btnBg=pkg.featured?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.06)';
+      var btnColor=pkg.featured?'#fff':'#94a3b8';
+      var btnBorder=pkg.featured?'none':'1px solid rgba(255,255,255,0.12)';
+      html+='<a href="mailto:ryan@remventures.tech?subject=AI Consulting - Package Inquiry" style="display:block;text-align:center;padding:11px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;background:'+btnBg+';color:'+btnColor+';border:'+btnBorder+';font-family:inherit;">Get started</a>';
+      html+='</div>';
+    });
+    html+='</div>';
+    el.innerHTML=html;
+  }
+
+  render();
+  renderPackages();
+})();
+</script>
+
 <section class="about" id="about">
   <div class="about-grid">
     <div>
