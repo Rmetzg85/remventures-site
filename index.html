@@ -341,6 +341,7 @@ footer {
   <ul>
     <li><a href="#about">About</a></li>
     <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#ai-consulting">AI Savings</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
@@ -355,25 +356,26 @@ footer {
     <p>REM Ventures is a SaaS development studio creating purpose-built tools across fintech, civic tech, family wellness, and trade services.</p>
     <div class="hero-btns">
       <a href="#portfolio" class="btn btn-primary">View Portfolio →</a>
+      <a href="#ai-consulting" class="btn btn-ghost">AI Savings →</a>
       <a href="#contact" class="btn btn-ghost">Get in Touch</a>
     </div>
   </div>
 </section>
 
-<section id="ai-consulting" style="background:linear-gradient(180deg,#0f172a 0%,#1e1b4b 100%);padding:80px 24px;font-family:'DM Sans',system-ui,sans-serif;">
+<section id="ai-consulting" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:6rem 4vw;font-family:'DM Sans',system-ui,sans-serif;">
 <div style="max-width:860px;margin:0 auto;">
-  <p style="font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f97316;margin-bottom:10px;">AI Consulting</p>
-  <h2 style="font-size:clamp(26px,4vw,38px);font-weight:700;color:#f8fafc;margin:0 0 12px;line-height:1.2;">How much is your business<br><span style="color:#f97316;">leaving on the table?</span></h2>
-  <p style="font-size:16px;color:#94a3b8;margin-bottom:36px;line-height:1.6;max-width:560px;">Fill out this free worksheet and we'll show you exactly where AI can save your business money — and which tools do the job.</p>
+  <div class="section-label">AI Consulting</div>
+  <div class="section-title">How much is your business<br><span style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">leaving on the table?</span></div>
+  <p class="section-sub">Fill out this free worksheet and we'll show you exactly where AI can save your business money — and which tools do the job.</p>
 
   <!-- Step form -->
   <div id="aic-form"></div>
 
   <!-- Packages -->
   <div style="margin-top:56px;">
-    <p style="font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f97316;margin-bottom:10px;">Our Packages</p>
-    <h3 style="font-size:24px;font-weight:700;color:#f8fafc;margin-bottom:6px;">Simple, flat-rate pricing</h3>
-    <p style="font-size:16px;color:#94a3b8;margin-bottom:28px;line-height:1.6;">No hidden fees. No long-term lock-in on the starter plan.</p>
+    <div class="section-label">Our Packages</div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,2.8vw,2.2rem);font-weight:700;color:var(--text-bright);margin-bottom:0.6rem;letter-spacing:-0.02em;">Simple, flat-rate pricing</div>
+    <p class="section-sub" style="margin-bottom:28px;">No hidden fees. No long-term lock-in on the starter plan.</p>
     <div id="aic-packages"></div>
   </div>
 </div>
